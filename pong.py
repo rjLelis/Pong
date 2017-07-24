@@ -1,6 +1,5 @@
-import pygame
+import pygame, colors
 from pygame.locals import *
-import colors
 
 pygame.init()
 
@@ -58,7 +57,7 @@ while not done:
     player1['speed']['y'] = 0
     player2['speed']['y'] = 0
 
-    if len(ball_list) <= 0:
+    if len(ball_list) == 0:
         ball_list.append(create_ball())
     
     for event in pygame.event.get():
