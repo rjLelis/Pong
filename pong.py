@@ -1,141 +1,127 @@
-import pygame, colors
+import pygame
 from pygame.locals import *
+import colors
 
-class Player(pygame.sprite.Sprite):
-    '''
-    Player class
-    '''
-    def __init__(self, color, width, height, x, y):
+pygame.init()
 
-        super().__init__()
+screen = pygame.display.set_mode((956, 560), 0, 32)
 
-        self.image = pygame.Surface([width, height])
+pygame.display.set_caption('Pong')
 
-        self.image.fill(color)
+font = pygame.font.SysFont('Calibri', 50, True, False)
 
-        self.rect = self.image.get_rect()
+player1 = { # Atributos do jogador á esquerda
+    'surface': [20, 99],
+    'position': [5, 210],
+    'speed': {
+        'x': 0,
+        'y': 0
+        },
+    'score': 0
+    }
 
-        self.x_pos = x
+player2 = { # Atributos do jogador á direita
+    'surface': [20, 99],
+    'position': [930, 210],
+    'speed': {
+        'x': 0,
+        'y': 0
+        },
+    'score': 0
+    }
 
-        self.y_pos = y
+ball = { # atributos da "bola"
+    'surface': [20, 25],
+    'position':[478, 210],
+    'speed': {
+        'x': 7,
+        'y': 7
+        }
+    }
 
-        self.x_speed = 5
+def get_rect(obj):
+    return Rect(obj['position'][0],
+                obj['position'][1],
+                obj['surface'][0],
+                obj['surface'][1])
 
-        self.y_speed = -5
-
-        self.score = 0
-
-def main():
+def player_collision(player):
+    player_rect = get_rect(player)
+    if player_rect.colliderect(get_rect(ball)):
+        return True
+    return False
     
-    '''Main Function'''
-    
-    pygame.init()
 
-    screen = pygame.display.set_mode((956, 560)) # Screen size
+clock = pygame.time.Clock()
 
-    pygame.display.set_caption('Pong') # Game title
+stantart_player_speed = 7 # velocidade dos jogadores
 
-    font = pygame.font.SysFont('Calibri', 50, True, False) # Game font
+done = False
 
-    player1 = Player(colors.WHITE, 20, 90, 5, 99) # Left player attributes
+while not done:
 
-    player2 = Player(colors.WHITE, 20, 90, 930, 210) # Right player attributes
+    player1['speed']['y'] = 0
+    player2['speed']['y'] = 0
 
-    ball_list = []
-
-    def create_ball():
-        '''Returns the ball attributes to be drawn in the screen'''
-        return { # Ball attributes
-            'surface': [20, 25],
-            'position':[478, 210],
-            'speed': {
-                'x': 5,
-                'y': -5
-                }
-            }
-
-    def remove_ball():
-        '''Removes the ball from the game'''
-        for ball in ball_list:
-            if ball['position'][0] > 956 or ball['position'][0] < 0:
-                ball_list.remove(ball)
-
-    clock = pygame.time.Clock()
-
-    stantart_player_speed = 7 # Stantart players speed
-
-    done = False
-
-    while not done:
-
-        player1.y_speed = 0
-        player2.y_speed = 0
-
-        if len(ball_list) == 0:
-            ball_list.append(create_ball())
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-                
-        # ---- Players moviments ---- #
-        
-        pressed_key = pygame.key.get_pressed()
-
-        if pressed_key[K_w]:
-            player1.y_speed = stantart_player_speed * (-1)
-        elif pressed_key[K_s]:
-            player1.y_speed = stantart_player_speed   
-
-        if pressed_key[K_UP]:
-            player2.y_speed = stantart_player_speed * (-1)
-        elif pressed_key[K_DOWN]:
-            player2.y_speed = stantart_player_speed
-
-        player1.y_pos += player1.y_speed
-        player2.y_pos += player2.y_speed
-
-        # ---- Drawings and moviments that appear on the screen ---- #
-        
-        screen.fill(colors.BLACK)
-
-        pygame.draw.line(screen, colors.BLUE, [478,0], [478,560], 5)
-
-        screen.blit(player1.image, (player1.x_pos,player1.y_pos))
-
-        screen.blit(player2.image, (player2.x_pos, player2.y_pos))
-
-        score_player1 = font.render(str(player1.score), True, colors.WHITE)
-        screen.blit(score_player1, [20, 15])
-
-        score_player2 = font.render(str(player2.score), True, colors.WHITE)
-        screen.blit(score_player2, [905, 15])
-        
-        for ball in ball_list:
-            pygame.draw.rect(screen, colors.WHITE, [ball['position'], ball['surface']])
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
             
-        ball['position'][0] += ball['speed']['x']
-        ball['position'][1] += ball['speed']['y']
+    # ---- Movimentação dos jogadores ---- #
+    
+    pressed_key = pygame.key.get_pressed()
 
-        # ---- Colisions ---- #
-       
-        if ball['position'][1] > 535 or ball['position'][1] < 0:
-            ball['speed']['y'] *= -1
+    if pressed_key[K_w]:
+        player1['speed']['y'] = stantart_player_speed * (-1)
+    elif pressed_key[K_s]:
+        player1['speed']['y'] = stantart_player_speed
 
-        if ball['position'][0] > 956:
-            player1.score += 1
-        elif ball['position'][0] < 0:
-            player2.score += 1
+    if pressed_key[K_UP]:
+        player2['speed']['y'] = stantart_player_speed * (-1)
+    elif pressed_key[K_DOWN]:
+        player2['speed']['y'] = stantart_player_speed
 
-        remove_ball()
+    player1['position'][1] += player1['speed']['y']
+    player2['position'][1] += player2['speed']['y']
 
-        # ---- Atualizar a tela do jogo ---- #
+    # ---- Desenhos que aparecem na tela ---- #
+    
+    screen.fill(colors.BLACK)
 
-        pygame.display.flip()
-        
-        clock.tick(30)
-        
-    pygame.quit()
+    score1 = font.render(str(player1['score']), True, colors.WHITE)
+    screen.blit(score1, [20, 20])
 
-if __name__ == '__main__':
-    main()
+    score2 = font.render(str(player2['score']), True, colors.WHITE)
+    screen.blit(score2, [910, 20])
+
+    pygame.draw.line(screen, colors.BLUE, [478,0], [478,560], 5)
+    
+    pygame.draw.rect(screen, colors.WHITE, [ball['position'], ball['surface']])
+    ball['position'][0] += ball['speed']['x']
+    ball['position'][1] += ball['speed']['y']
+
+    pygame.draw.rect(screen, colors.WHITE,[player1['position'], player1['surface']])
+    pygame.draw.rect(screen, colors.WHITE, [player2['position'], player2['surface']])
+
+    # ---- Colisões ---- #
+
+    if player_collision(player1):
+        ball['speed']['x'] *= -1
+    elif player_collision(player2):
+        ball['speed']['x'] *= -1
+   
+    if ball['position'][1] > 535 or ball['position'][1] < 0:
+        ball['speed']['y'] *= -1
+
+    if ball['position'][0] > 956:
+        player1['score'] += 1
+        ball['position'] = [478, 210]
+    elif ball['position'][0] < 0:
+        player2['score'] += 1
+        ball['position'] = [478, 210]
+
+    pygame.display.update()
+    
+    clock.tick(30)
+    
+pygame.quit()
