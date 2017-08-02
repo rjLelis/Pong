@@ -1,6 +1,5 @@
-import pygame
+import pygame, colors
 from pygame.locals import *
-import colors
 
 pygame.init()
 
@@ -34,12 +33,12 @@ ball = { # atributos da "bola"
     'surface': [20, 25],
     'position':[478, 210],
     'speed': {
-        'x': 7,
-        'y': 7
+        'x': 10,
+        'y': 10
         }
     }
 
-def get_rect(obj):
+def get_rect(obj): # Transforma os desenhos em um retângulo
     return Rect(obj['position'][0],
                 obj['position'][1],
                 obj['surface'][0],
@@ -50,11 +49,11 @@ def player_collision(player):
     if player_rect.colliderect(get_rect(ball)):
         return True
     return False
-    
+
 
 clock = pygame.time.Clock()
 
-stantart_player_speed = 7 # velocidade dos jogadores
+stantart_player_speed = 9 # velocidade dos jogadores
 
 done = False
 
@@ -66,9 +65,9 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-            
+
     # ---- Movimentação dos jogadores ---- #
-    
+
     pressed_key = pygame.key.get_pressed()
 
     if pressed_key[K_w]:
@@ -85,7 +84,7 @@ while not done:
     player2['position'][1] += player2['speed']['y']
 
     # ---- Desenhos que aparecem na tela ---- #
-    
+
     screen.fill(colors.BLACK)
 
     score1 = font.render(str(player1['score']), True, colors.WHITE)
@@ -95,7 +94,7 @@ while not done:
     screen.blit(score2, [910, 20])
 
     pygame.draw.line(screen, colors.BLUE, [478,0], [478,560], 5)
-    
+
     pygame.draw.rect(screen, colors.WHITE, [ball['position'], ball['surface']])
     ball['position'][0] += ball['speed']['x']
     ball['position'][1] += ball['speed']['y']
@@ -109,7 +108,7 @@ while not done:
         ball['speed']['x'] *= -1
     elif player_collision(player2):
         ball['speed']['x'] *= -1
-   
+
     if ball['position'][1] > 535 or ball['position'][1] < 0:
         ball['speed']['y'] *= -1
 
@@ -121,7 +120,7 @@ while not done:
         ball['position'] = [478, 210]
 
     pygame.display.update()
-    
+
     clock.tick(30)
-    
+
 pygame.quit()
