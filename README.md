@@ -1,7 +1,7 @@
 # Pong
 Jogo de pong feito em python 3.6 e o modulo pygame
 
-# Como jogar
+### Como jogar
 
 **Jogador da esquerda**: *W* move para cima, *S* move para baixo
 
